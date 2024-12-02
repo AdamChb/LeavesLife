@@ -11,8 +11,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier tout le projet dans le conteneur
 COPY . .
 
-# Exposer le port utilisé par Streamlit ou Flask
+# Exposer le port utilisé
 EXPOSE 8501
 
 # Commande par défaut pour démarrer l'application Streamlit
-CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+# Commande par défaut pour démarrer l'application Jupyter Notebook
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8501", "--no-browser", "--allow-root"]
