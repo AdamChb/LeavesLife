@@ -1,18 +1,18 @@
-# Utiliser une image Python de base
+# Use a base Python image
 FROM python:3.9-slim
 
-# Définir le répertoire de travail dans le conteneur
+# Set the working directory in the container
 WORKDIR /app
 
-# Copier le fichier requirements.txt et installer les dépendances
-COPY requirements.txt .
+# Copy the requirements file and install dependencies
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier tout le projet dans le conteneur
-COPY . .
+# Copy the entire project into the container
+COPY ./src /app
 
-# Exposer le port utilisé par Streamlit ou Flask
-EXPOSE 8501
+# Expose the port the app runs on
+EXPOSE 5000
 
-# Commande par défaut pour démarrer l'application Streamlit
-CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Define the command to run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--reload"]

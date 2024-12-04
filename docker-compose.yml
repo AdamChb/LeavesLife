@@ -1,0 +1,20 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    volumes:
+      - ./src:/app
+    environment:
+      - FLASK_ENV=development
+    
+  mlflow:
+    image: ghcr.io/mlflow/mlflow
+    volumes:
+      - ./mlruns:/mlruns
+    environment:
+      MLFLOW_BACKEND_STORE_URI: /mlruns
+      MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT: /mlruns

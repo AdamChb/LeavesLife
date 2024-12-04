@@ -1,7 +1,5 @@
-streamlit
 flask
 pandas
 numpy
-tensorflow
 scikit-learn
 mlflow

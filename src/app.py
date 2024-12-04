@@ -1,9 +1,12 @@
-import streamlit as st
+from flask import Flask, render_template
 
-# Affichage dans l'interface Streamlit
-st.write("Hello, World!")
-st.write("dklfjfbslkdjbsldf")
-st.write("Je suis une plante malade")
+app = Flask(__name__)
 
-# Affichage dans le terminal
-print("Test message in terminal")
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+@app.route('/')
+def home():
+    return render_template('index.html', title='Home Page')
+
+if __name__ == '__main__':
+    app.run(debug=True)
