@@ -27,6 +27,7 @@ def read_image(file_path):
         return None
     
 def save_image(image_data, file_path):
+    array = image_data.numpy().astype(np.uint8) if isinstance(image_data, tf.Tensor) else image_data.astype(np.uint8)
     with Image.fromarray(image_data) as image:
         image.save(file_path)
         
@@ -51,14 +52,14 @@ def data_augmentation(file_path, folder_path):
     
     # Data augmentation by rotating and randomly adjusting contrast
     rotated_image = tf.image.rot90(image_data)
-    contrast_image = tf.image.stateless_random_contrast(rotated_image, lower=0.2, upper=0.8, seed=(1, 2))
+    contrast_image = tf.image.random_contrast(rotated_image, lower=0.2, upper=0.8)
     
     # Data augmentation by adding noise + adjusting saturation
-    noisy_image = tf.image.random_jpeg_quality(image_data, min_jpeg_quality=5, max_jpeg_quality=20, seed=0)
+    noisy_image = tf.image.random_jpeg_quality(image_data, min_jpeg_quality=5, max_jpeg_quality=20)
     noisy_image = tf.image.adjust_saturation(noisy_image, 2)
     
     # Data augmentation by cropping the image randomly, turning it then grayscaling it
-    cropped_image = tf.image.random_crop(image_data, size=(128, 128, 3), seed=0)
+    cropped_image = tf.image.random_crop(image_data, size=(128, 128, 3))
     cropped_image = tf.image.rot90(cropped_image, k=3)
     cropped_image = tf.image.rgb_to_grayscale(cropped_image)
     
@@ -75,7 +76,8 @@ def data_augmentation(file_path, folder_path):
 def launch_data_augmentation(folder_paths): 
     for folder_path in folder_paths:
         folder_path = f"../Dataset/{folder_path}"
-        for file in os.listdir(folder_path):
+        list = os.listdir(folder_path)
+        for file in list:
             data_augmentation(f"{folder_path}/{file}", folder_path)
     
 
