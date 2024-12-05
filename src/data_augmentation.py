@@ -24,7 +24,7 @@ print('Image Shape: {} \nRows: {}, \nColumns: {}, \nRGB values: {}'.format(image
 normalize = Normalizer()
 
 
-plt.figure(figsize=(12, 18))
+# plt.figure(figsize=(12, 18))
 
 dim = (4, 2)
 
