@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaves Life</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            color: #386641;
+            background-color: white;
+            padding: 0 7em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header img {
+            height: 50px;
+            margin-right: 20px;
+        }
+        a {
+            color: white;
+            text-decoration: underline;
+            text-decoration-color: #a7c957;
+            text-decoration-thickness: 4px;
+            transition: .3s;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            background-color: #6a994e;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: .3s;
+        }
+        a:hover {
+            transform: scale(1.1);
+        }
+        main {
+            padding: 5em 7em 10em 7em;
+            background: rgb(2,0,36);
+            background: linear-gradient(
+                135deg,
+                #386641, /* Dark green */
+                #4a7f42, /* Intermediate dark green */
+                #6a994e, /* Medium green */
+                #85b268, /* Light-medium green */
+                #a7c957, /* Bright green */
+                #c2d882, /* Soft yellow-green */
+                #e3f4ab  /* Pale yellow */
+                );
+        }
+        .title{
+            font-size: 3em;
+            opacity: .9;
+            color: white;
+            margin: 1em 0;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideInFromTop 1s ease-out;
+        }
+        .name{
+            font-size: 2em;
+        }
+        .title-section {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        .content-section {
+            display: flex;
+            justify-content: space-between;
+        }
+        .results {
+            margin: 1em;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1em 2em;
+            border-radius: .5em;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideInFromLeft 1s ease-out;
+        }
+        .results .accuracy-bar {
+            background-color: #a7c957;
+            height: 2em;
+            border-radius: .5em;
+            margin: 1em 0;
+            position: relative;
+            border: 2px solid white;
+            overflow: hidden;
+        }
+        .results .accuracy-bar span {
+            display: block;
+            height: 100%;
+            background-color: #6a994e;
+            border-radius: .5em;
+            width: 0;
+            animation: fillBar 3s forwards;
+        }
+        .results .accuracy-bar span::after {
+            content: attr(data-content);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .results .status {
+            font-size: 1.5em;
+            margin: 1em 0;
+            line-height: 1.5em;
+        }
+        .results .status.healthy {
+            color: #386641;
+            font-weight: bold;
+        }
+        .results .status.diseased {
+            color: #da4453;
+            font-weight: bold;
+        }
+        .results .status img {
+            vertical-align: middle;
+            margin-right: 10px;
+            width: 20px;
+        }
+        .leaf-image {
+            margin: 1em;
+            border-radius: 5px;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: slideInFromRight 1s ease-out;
+        }
+        .leaf-image img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        @keyframes fillBar {
+            to {
+                width: var(--bar-width);
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: .9;
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center;">
+            <img src="leaficon.svg" alt="Logo">
+            <h1 class="name">Leaves Life</h1>
+        </div>
+        <a href="project.html">Project presentation</a>
+    </header>
+    <main>
+        <section class="title-section">
+            <h1 class="title">Detection Results</h1>
+        </section>
+        <div class="content-section">
+            <section class="results">
+                <h2>Potato Leaf</h2>
+                <p>Model Used: Convolutional Neural Network (CNN)</p>
+                <p>Accuracy</p>
+                <div class="accuracy-bar">
+                    <span style="--bar-width: 85%;" data-content="85%"></span>
+                </div>
+                <p>Metric 2</p>
+                <div class="accuracy-bar">
+                    <span style="--bar-width: 17%;" data-content="17%"></span>
+                </div>
+                <p class="status diseased"><img src="cross-icon.svg" alt="Cross Icon">Leaf is Diseased (Disease name)</p>
+                <p class="status healthy"><img src="check-icon.svg" alt="Check Icon">Leaf is Healthy</p>
+            </section>
+            <img src="leaf.jpg" class="leaf-image" alt="Leaf Image">
+        </div>
+    </main>
+    <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
+        <p>&copy; 2024 Mathias BENOIT - Adam CHABA - Eva MAROT - Sacha PORTAL</p>
+    </footer>
+</body>
+</html>

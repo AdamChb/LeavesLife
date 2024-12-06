@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #386641;
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        isolation: isolate;
+      }
+    </style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 28.7.0, SVG Export Plug-In . SVG Version: 1.2.0 Build 136)  -->
+  <g>
+    <g id="svg4646" inkscape:version="0.92.3 (2405546, 2018-03-11)">
+      <sodipodi:namedview id="namedview4648" bordercolor="#666666" borderopacity="1" gridtolerance="10" guidetolerance="10" inkscape:current-layer="g4644" inkscape:cx="24" inkscape:cy="24" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-height="1027" inkscape:window-maximized="1" inkscape:window-width="1920" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:zoom="4.9166667" objecttolerance="10" pagecolor="#ffffff" showgrid="false"/>
+      <g id="g4644" class="cls-3">
+        <circle id="circle4640" class="cls-1" cx="24" cy="24" r="24"/>
+        <path id="path4642" class="cls-2" d="M36.8,18.1l-2.3-2.3c-.3-.3-.7-.5-1.2-.5s-.8.2-1.2.5l-11.2,11.2-5-5c-.3-.3-.7-.5-1.2-.5s-.8.2-1.2.5l-2.3,2.3c-.3.3-.5.7-.5,1.2s.2.8.5,1.2l6.2,6.2,2.3,2.3c.3.3.7.5,1.2.5s.8-.2,1.2-.5l2.3-2.3,12.4-12.4c.3-.3.5-.7.5-1.2s-.2-.8-.5-1.2"/>
+      </g>
+    </g>
+  </g>
+</svg>

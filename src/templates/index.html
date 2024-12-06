@@ -3,10 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
+    <title>Leaves Life</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            color: #386641;
+            background-color: white;
+            padding: 0 7em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header img {
+            height: 50px;
+            margin-right: 20px;
+        }
+        a {
+            color: white;
+            text-decoration: underline;
+            text-decoration-color: #a7c957;
+            text-decoration-thickness: 4px;
+            transition: .3s;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            background-color: #6a994e;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: .3s;
+        }
+        a:hover {
+            transform: scale(1.1);
+        }
+        main {
+            padding: 5em 7em 10em 7em;
+            background: rgb(2,0,36);
+            background: linear-gradient(
+                135deg,
+                #386641, /* Dark green */
+                #4a7f42, /* Intermediate dark green */
+                #6a994e, /* Medium green */
+                #85b268, /* Light-medium green */
+                #a7c957, /* Bright green */
+                #c2d882, /* Soft yellow-green */
+                #e3f4ab  /* Pale yellow */
+                );
+        }
+        .title{
+            font-size: 3em;
+            opacity: .9;
+            color: white;
+            margin: 1em 0;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideInFromTop 1s ease-out;
+        }
+        .name{
+            font-size: 2em;
+        }
+        .title-section {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        .content-section {
+            display: flex;
+            justify-content: space-between;
+        }
+        .presentation {
+            animation: slideInFromLeft 1s ease-out;
+            margin: 1em;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1em 2em;
+            border-radius: 5px;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .drag-drop {
+            animation: slideInFromRight 1s ease-out;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 1em;
+            padding: 4em 7em;
+            border: 2px dashed white;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .drag-drop:hover {
+            background-color: rgba(56, 102, 65, 0.5);
+            color: white;
+        }
+        .hidden-input {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the {{ title }}</h1>
-    <p>This is a simple Flask template example.</p>
+    <header>
+        <div style="display: flex; align-items: center;">
+            <img src="leaficon.svg" alt="Logo">
+            <h1 class="name">Leaves Life</h1>
+        </div>
+        <a href="project.html">Project presentation</a>
+    </header>
+    <main>
+        <section class="title-section">
+            <h1 class="title">Detect Leaf Diseases</h1>
+        </section>
+        <div class="content-section">
+            <section class="presentation">
+                <h2>What is Leaves Life?</h2>
+                <p>Welcome to our machine learning project. We use different supervised learning techniques in order to detect diseases in leaf pictures. <a href="project.html">Learn more about our project here.</a></p>
+                <h2>How to use it?</h2>
+                <p>You only have to insert a leaf image that is supported by our project, and it will detect any disease or the healthyness of the leaf!</p>
+            </section>
+            <section class="drag-drop" onclick="document.getElementById('fileInput').click();" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+                <img src="upload.svg" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
+                <h2>Upload Your Leaf Image</h2>
+                <p>Drag and drop an image here or click to select a file</p>
+                <input type="file" id="fileInput" class="hidden-input" onchange="fileInputHandler(event);">
+            </section>
+        </div>
+    </main>
+    <script>
+        function dragOverHandler(event) {
+            event.preventDefault();
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                alert(`File ${files[0].name} uploaded successfully.`);
+            }
+        }
+
+        function fileInputHandler(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                alert(`File ${files[0].name} uploaded successfully.`);
+            }
+        }
+    </script>
+    <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
+        <p>&copy; 2024 Mathias BENOIT - Adam CHABA - Eva MAROT - Sacha PORTAL</p>
+    </footer>
 </body>
 </html>
+<style>
+    @keyframes slideInFromTop {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: .9;
+        }
+    }
+
+    @keyframes slideInFromLeft {
+        from {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInFromRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+<script>
+    function showSpinner() {
+        const spinner = document.createElement('div');
+        spinner.classList.add('spinner');
+        document.body.appendChild(spinner);
+    }
+
+    function hideSpinner() {
+        const spinner = document.querySelector('.spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+
+    function fileInputHandler(event) {
+        const files = event.target.files;
+        if (files.length > 0) {
+            showSpinner();
+            setTimeout(() => {
+                hideSpinner();
+                window.location.href = 'detection.html';
+            }, 2000);
+        }
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            showSpinner();
+            setTimeout(() => {
+                hideSpinner();
+                window.location.href = 'detection.html';
+            }, 2000);
+        }
+    }
+</script>
+<style>
+    .spinner {
+        top: 50%;
+        left: 50%;
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-top: 5px solid #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style></script>
+<script>
+    function showSpinner() {
+        const dragDropSection = document.querySelector('.drag-drop');
+        dragDropSection.innerHTML = '<div class="spinner"></div>';
+        dragDropSection.style.display = 'flex';
+        dragDropSection.style.alignItems = 'center';
+        dragDropSection.style.justifyContent = 'center';
+    }
+
+    function hideSpinner() {
+        const dragDropSection = document.querySelector('.drag-drop');
+        dragDropSection.style.display = '';
+        dragDropSection.style.alignItems = '';
+        dragDropSection.style.justifyContent = '';
+        dragDropSection.innerHTML = `
+            <img src="upload.svg" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
+            <h2>Upload Your Leaf Image</h2>
+            <p>Drag and drop an image here or click to select a file</p>
+            <input type="file" id="fileInput" class="hidden-input" onchange="fileInputHandler(event);">
+        `;
+    }
+
+    function fileInputHandler(event) {
+        const files = event.target.files;
+        if (files.length > 0) {
+            showSpinner();
+            setTimeout(() => {
+                hideSpinner();
+                window.location.href = 'detection.html';
+            }, 2000);
+        }
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            showSpinner();
+            setTimeout(() => {
+                hideSpinner();
+                window.location.href = 'detection.html';
+            }, 2000);
+        }
+    }
+</script>
