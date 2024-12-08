@@ -3,6 +3,7 @@ from predict_image import predict_image
 from train_model import train_model
 import mlflow
 from threading import Thread
+import os
 
 app = Flask(__name__)
 
@@ -29,8 +30,10 @@ def home():
     return render_template("index.html")
 
 if __name__ == '__main__':
-    mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
-    # mlflow.set_tracking_uri("http://mlflow:5000")  # For Docker tracking server
+    if os.getenv("RUNNING_IN_DOCKER"):
+        mlflow.set_tracking_uri("http://mlflow:5000")  # For Docker tracking server
+    else:
+        mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
     print("Training models before running the app...")
     train_models_in_background()
     print("Models trained before running the app.")

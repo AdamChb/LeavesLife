@@ -15,6 +15,7 @@ services:
     environment:
       - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
+      - RUNNING_IN_DOCKER=true
     mem_limit: 20g
     depends_on:
       - mlflow
