@@ -8,5 +8,13 @@
 <body>
     <h1>Welcome to the {{ title }}</h1>
     <p>This is a simple Flask template example.</p>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="submit" value="Upload">
+    </form>
+    {% if predicted_class is not none %}
+        <h2>Predicted class: {{ predicted_class }}</h2>
+        <h2>Probability: {{ probability }}</h2>
+    {% endif %}
 </body>
 </html>
