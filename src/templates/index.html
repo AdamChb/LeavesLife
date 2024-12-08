@@ -108,6 +108,7 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     <header>
         <div style="display: flex; align-items: center;">
             <img src="leaficon.svg" alt="Logo">
@@ -157,6 +158,18 @@
     <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
         <p>&copy; 2024 Mathias BENOIT - Adam CHABA - Eva MAROT - Sacha PORTAL</p>
     </footer>
+=======
+    <h1>Welcome to the {{ title }}</h1>
+    <p>This is a simple Flask template example.</p>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="submit" value="Upload">
+    </form>
+    {% if predicted_class is not none %}
+        <h2>Predicted class: {{ predicted_class }}</h2>
+        <h2>Probability: {{ probability }}</h2>
+    {% endif %}
+>>>>>>> adam
 </body>
 </html>
 <style>

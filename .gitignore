@@ -1,7 +1,12 @@
-__pychache__/
+__pycache__/
 *.pyc
 .env/
 *.h5
 *.pkl
 *.log
 .idea/
+.venv/
+test.py
+Dataset_test_code/
+mlruns/
+models/
