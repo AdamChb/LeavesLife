@@ -29,8 +29,10 @@
             text-decoration-color: #a7c957;
             text-decoration-thickness: 4px;
             transition: .3s;
+            font-weight: bold;
         }
-        header a {
+        header a, .button {
+            font-weight: normal;
             color: white;
             text-decoration: none;
             background-color: #6a994e;
@@ -73,6 +75,14 @@
         .content-section {
             display: flex;
             justify-content: space-between;
+        }
+        .button-section {
+            margin-top: 2em;
+            display: flex;
+            justify-content: center;
+        }
+        .button{
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .results {
             margin: 1em;
@@ -212,14 +222,13 @@
                 <div class="accuracy-bar">
                     <span style="--bar-width: 85%;" data-content="85%"></span>
                 </div>
-                <p>Metric 2</p>
-                <div class="accuracy-bar">
-                    <span style="--bar-width: 17%;" data-content="17%"></span>
-                </div>
                 <p class="status diseased"><img src="cross-icon.svg" alt="Cross Icon">Leaf is Diseased (Disease name)</p>
                 <p class="status healthy"><img src="check-icon.svg" alt="Check Icon">Leaf is Healthy</p>
             </section>
             <img src="leaf.jpg" class="leaf-image" alt="Leaf Image">
+        </div>
+        <div class="button-section">
+            <a href="index.html" class="button">Back to home page</a>
         </div>
     </main>
     <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
