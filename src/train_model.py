@@ -18,7 +18,7 @@ def define_seed(seed):
     np.random.seed(seed)
     tf.random.set_seed(seed)
 
-def load_data(data_dir, max_files_per_folder=1000):
+def load_data(data_dir, max_files_per_folder=50):
     data = []
     labels = []
     for folder in os.listdir(data_dir):
@@ -236,7 +236,11 @@ def train_model(seed):
         print("Classification Report:\n", report)
     
 if __name__ == "__main__":
-    for i in range(0, 10):
-        print(f"\n\nTraining model with seed {i}...\n\n")
-        train_model(seed=i)
-        print(f"\n\nModel trained with seed {i}.\n\n")
+    if os.getenv("RUNNING_IN_DOCKER"):
+        mlflow.set_tracking_uri("http://mlflow:5000")  # For Docker tracking server
+    else:
+        mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
+    # for i in range(0, 10):
+    #     print(f"\n\nTraining model with seed {i}...\n\n")
+    train_model(seed=10)
+        # print(f"\n\nModel trained with seed {i}.\n\n")
