@@ -1,18 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from predict_image import predict_image
 from train_model import train_model
 import mlflow
 from threading import Thread
+import os
 
-app = Flask(__name__)
-
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-def train_models_in_background():
-    for i in range(0, 10):
-        print(f"\n\nTraining model with seed {i}...\n\n")
-        train_model(seed=i)
-        print(f"\n\nModel trained with seed {i}.\n\n")
+app = Flask(__name__)    
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -25,13 +18,19 @@ def home():
         if file:
             image_bytes = file.read()
             predicted_class, probability = predict_image(image_bytes)
-            return render_template("index.html", predicted_class=predicted_class, probability=probability)
+            return redirect(url_for('detection', predicted_class=predicted_class, probability=probability))
     return render_template("index.html")
 
+@app.route('/detection')
+def detection():
+    predicted_class = request.args.get('predicted_class')
+    probability = request.args.get('probability')
+    return render_template("detection.html", predicted_class=predicted_class, probability=probability)
+
+
 if __name__ == '__main__':
-    mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
-    # mlflow.set_tracking_uri("http://mlflow:5000")  # For Docker tracking server
-    print("Training models before running the app...")
-    train_models_in_background()
-    print("Models trained before running the app.")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    if os.getenv("RUNNING_IN_DOCKER"):
+        mlflow.set_tracking_uri("http://mlflow:5000")  # For Docker tracking server
+    else:
+        mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
+    app.run(debug=False, host='0.0.0.0', port=5000)

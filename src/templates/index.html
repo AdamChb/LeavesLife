@@ -260,7 +260,7 @@
             transform: rotate(360deg);
         }
     }
-</style></script>
+</style>
 <script>
     function showSpinner() {
         const dragDropSection = document.querySelector('.drag-drop');
@@ -283,14 +283,28 @@
         `;
     }
 
+    function uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.href = `detection.html?predicted_class=${data.predicted_class}&probability=${data.probability}`;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
     function fileInputHandler(event) {
         const files = event.target.files;
         if (files.length > 0) {
             showSpinner();
-            setTimeout(() => {
-                hideSpinner();
-                window.location.href = 'detection.html';
-            }, 2000);
+            uploadFile(files[0]);
         }
     }
 
@@ -299,10 +313,7 @@
         const files = event.dataTransfer.files;
         if (files.length > 0) {
             showSpinner();
-            setTimeout(() => {
-                hideSpinner();
-                window.location.href = 'detection.html';
-            }, 2000);
+            uploadFile(files[0]);
         }
     }
 </script>
