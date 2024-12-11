@@ -4,8 +4,6 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import mlflow
 import mlflow.tensorflow
@@ -18,35 +16,41 @@ def define_seed(seed):
     np.random.seed(seed)
     tf.random.set_seed(seed)
 
-def load_data(data_dir, max_files_per_folder=50):
-    data = []
-    labels = []
-    for folder in os.listdir(data_dir):
-        folder_path = os.path.join(data_dir, folder)
-        if os.path.isdir(folder_path):
-            label = folder
-            files = os.listdir(folder_path)
-            if len(files) > max_files_per_folder:
-                files = random.sample(files, max_files_per_folder)
-            for file in files:
-                file_path = os.path.join(folder_path, file)
-                image = tf.keras.preprocessing.image.load_img(file_path, target_size=(256, 256))
-                image = tf.keras.preprocessing.image.img_to_array(image)
-                data.append(image)
-                labels.append(label)
-    return np.array(data), np.array(labels)
+def load_data(data_dir, img_height=256, img_width=256, batch_size=32):
+    train_data = tf.keras.utils.image_dataset_from_directory(
+        data_dir,
+        validation_split=0.2,
+        subset="training",
+        seed=123,
+        image_size=(img_height, img_width),
+        batch_size=batch_size
+    )
+    
+    val_data = tf.keras.utils.image_dataset_from_directory(
+        data_dir,
+        validation_split=0.2,
+        subset="validation",
+        seed=123,
+        image_size=(img_height, img_width),
+        batch_size=batch_size
+    )
+    
+    return train_data, val_data
 
-def preprocess_data(X, y):
-    X = X / 255.0
-    label_encoder = LabelEncoder()
-    y = label_encoder.fit_transform(y)
-    y = tf.keras.utils.to_categorical(y)
-    return X, y, label_encoder
+def preprocess_data(dataset, num_classes):
+    """
+    Normalize images and convert labels to categorical.
+    """
+    def process(image, label):
+        # Normalize image
+        image = tf.cast(image, tf.float32) / 255.0
+        # Convert label to one-hot encoding
+        label = tf.one_hot(label, depth=num_classes)
+        return image, label
 
-def create_dataset(X, y, batch_size=32):
-    dataset = tf.data.Dataset.from_tensor_slices((X, y))
-    dataset = dataset.shuffle(buffer_size=len(X)).batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    return dataset
+    # Apply normalization and one-hot encoding
+    dataset = dataset.map(process, num_parallel_calls=tf.data.AUTOTUNE)
+    return dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     plt.figure(figsize=(17, 17))
@@ -123,15 +127,15 @@ def train_model(seed):
     print("Loading data...")
     script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))    
     data_dir = os.path.join(script_dir, 'Dataset')
-    X, y = load_data(data_dir)
-    X, y, label_encoder = preprocess_data(X, y)
+    train_data, val_data = load_data(data_dir)
+    class_names = train_data.class_names
+    num_classes = len(class_names)
     print("Data loaded.")
 
-    print("Splitting data...")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    train_dataset = create_dataset(X_train, y_train)
-    test_dataset = create_dataset(X_test, y_test)
-    print("Data splitted.")
+    # Preprocess data
+    train_data = preprocess_data(train_data, num_classes)
+    val_data = preprocess_data(val_data, num_classes)
+    print("Data preprocessed.")
 
     print("Creating model...")
     model = Sequential([
@@ -141,9 +145,9 @@ def train_model(seed):
         MaxPooling2D((2, 2)),
         Flatten(),
         Dense(256, activation='relu'),
-        Dense(len(label_encoder.classes_), activation='softmax')
+        Dense(num_classes, activation='softmax')
     ])
-    model.class_names = os.listdir(data_dir)
+    model.class_names = class_names
     print("Model created.")
 
     print("Compiling model...")
@@ -171,9 +175,9 @@ def train_model(seed):
     mlflow.set_experiment("LeavesLife")
     with mlflow.start_run(run_name=f"Train_1.{seed}"):
         print("Training model...")
-        history = model.fit(train_dataset,
+        history = model.fit(train_data,
                             epochs=10,
-                            validation_data=test_dataset,
+                            validation_data=val_data,
                             callbacks=[checkpoint_callback, early_stopping_callback])
         print("Model trained.")
         
@@ -192,11 +196,14 @@ def train_model(seed):
         print("Model saved.")
 
         print("Evaluating model...")
-        y_pred = model.predict(X_test)
-        y_pred_classes = np.argmax(y_pred, axis=1)
-        y_true_classes = np.argmax(y_test, axis=1)
-        accuracy = accuracy_score(y_true_classes, y_pred_classes)
-        report = classification_report(y_true_classes, y_pred_classes, target_names=label_encoder.classes_)
+        y_pred = []
+        y_true = []
+        for features, labels in val_data:
+            predictions = model.predict(features)
+            y_pred.extend(np.argmax(predictions, axis=1))
+            y_true.extend(np.argmax(labels.numpy(), axis=1))
+        accuracy = accuracy_score(y_true, y_pred)
+        report = classification_report(y_true, y_pred, target_names=class_names)
         print("Model evaluated.")
         
         print("Saving classification report...")
@@ -205,8 +212,8 @@ def train_model(seed):
         print("Classification report saved.")
 
         # Confusion Matrix
-        cm = confusion_matrix(y_true_classes, y_pred_classes)
-        plot_confusion_matrix(cm, classes=label_encoder.classes_)
+        cm = confusion_matrix(y_true, y_pred)
+        plot_confusion_matrix(cm, classes=class_names)
         plt.savefig(f"../models/1.{seed}/confusion_matrix_{seed}.png")
         plt.close()
 
@@ -240,7 +247,4 @@ if __name__ == "__main__":
         mlflow.set_tracking_uri("http://mlflow:5001")  # For Docker tracking server
     else:
         mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
-    # for i in range(0, 10):
-    #     print(f"\n\nTraining model with seed {i}...\n\n")
     train_model(seed=10)
-        # print(f"\n\nModel trained with seed {i}.\n\n")
