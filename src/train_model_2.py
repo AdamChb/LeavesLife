@@ -4,8 +4,6 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import mlflow
 import mlflow.tensorflow
@@ -13,109 +11,46 @@ import random
 import matplotlib.pyplot as plt
 import itertools
 
-
-print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-if len(tf.config.list_physical_devices('GPU')) > 0:
-    print("TensorFlow is using the GPU.")
-else:
-    print("No GPU detected. TensorFlow will run on the CPU.")
-
-
 def define_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
     tf.random.set_seed(seed)
 
-import pathlib
-batch_size = 32
-img_height = 256
-img_width = 256
+def load_data(data_dir, img_height=256, img_width=256, batch_size=32):
+    train_data = tf.keras.utils.image_dataset_from_directory(
+        data_dir,
+        validation_split=0.2,
+        subset="training",
+        seed=123,
+        image_size=(img_height, img_width),
+        batch_size=batch_size
+    )
+    
+    val_data = tf.keras.utils.image_dataset_from_directory(
+        data_dir,
+        validation_split=0.2,
+        subset="validation",
+        seed=123,
+        image_size=(img_height, img_width),
+        batch_size=batch_size
+    )
+    
+    return train_data, val_data
 
-def load_data(data_dir):
-    data = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="both",
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
-    return data
-
-# Preprocessing function
-def preprocess_data(dataset):
+def preprocess_data(dataset, num_classes):
     """
     Normalize images and convert labels to categorical.
     """
     def process(image, label):
         # Normalize image
         image = tf.cast(image, tf.float32) / 255.0
-        label = tf.one_hot(label, depth=25)
+        # Convert label to one-hot encoding
+        label = tf.one_hot(label, depth=num_classes)
         return image, label
 
-    # Apply normalization
-    dataset = dataset.map(process)
-    return dataset
-
-def create_dataset(X, y, batch_size=32):
-    dataset = tf.data.Dataset.from_tensor_slices((X, y))
-    dataset = dataset.shuffle(buffer_size=len(X)).batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    return dataset
-
-# def load_data(data_dir, max_files_per_folder=1000):
-#     data = []
-#     labels = []
-#     for folder in os.listdir(data_dir):
-#         folder_path = os.path.join(data_dir, folder)
-#         if os.path.isdir(folder_path):
-#             label = folder
-#             files = os.listdir(folder_path)
-#             if len(files) > max_files_per_folder:
-#                 files = random.sample(files, max_files_per_folder)
-#             for file in files:
-#                 file_path = os.path.join(folder_path, file)
-#                 image = tf.keras.preprocessing.image.load_img(file_path, target_size=(256, 256))
-#                 image = tf.keras.preprocessing.image.img_to_array(image)
-#                 data.append(image) Problem is here
-#                 labels.append(label)
-#     return np.array(data), np.array(labels)
-
-# def preprocess_data(X, y):
-#     X = X / 255.0
-#     label_encoder = LabelEncoder()
-#     y = label_encoder.fit_transform(y)
-#     y = tf.keras.utils.to_categorical(y)
-#     return X, y, label_encoder
-
-# Function to extract labels from the dataset
-def extract_labels(dataset):
-    labels = []
-    for batch in dataset:
-        # Extract the labels from the batch
-        _, batch_labels = batch
-        labels.append(batch_labels.numpy())  # Convert to NumPy
-    return np.concatenate(labels)  # Flatten into a 1D array
-
-# Load the dataset
-print("Loading Data...")
-data_dir = os.path.join("C:/Users/mat15/Documents/GitHub/LeavesLife/Dataset")
-dataset = load_data(data_dir)  # Returns a tf.data.Dataset
-print("Data Loaded")
-
-# Extract and preprocess labels
-label_encoder = LabelEncoder()
-labels = extract_labels(dataset)  # Extract 1D array of labels
-encoded_labels = label_encoder.fit_transform(labels)
-
-# Preprocess data
-X = preprocess_data(X)
-y = preprocess_data(y)
-print("Data preprocessed.")
-
-# Check the processed dataset
-for images, labels in X.take(1):
-    print(f"Images shape: {images.shape}")
-    print(f"Labels shape: {labels.shape}")
-print("Data Loaded")
+    # Apply normalization and one-hot encoding
+    dataset = dataset.map(process, num_parallel_calls=tf.data.AUTOTUNE)
+    return dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     plt.figure(figsize=(17, 17))
@@ -186,16 +121,21 @@ class CustomModelCheckpoint(ModelCheckpoint):
             self.best_epoch = epoch
             self.model.save(self.filepath.format(epoch=epoch, **logs), overwrite=True)
 
-
-print(X, end="\n\n")
-print(y)
-
 def train_model(seed):
     define_seed(seed)
+    
+    print("Loading data...")
+    script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))    
+    data_dir = os.path.join(script_dir, 'Dataset')
+    train_data, val_data = load_data(data_dir)
+    class_names = train_data.class_names
+    num_classes = len(class_names)
+    print("Data loaded.")
 
-    # Ensure datasets are properly batched
-    train_dataset = X.unbatch().batch(32).prefetch(tf.data.AUTOTUNE)  # Adjust batch size as needed
-    val_dataset = y.unbatch().batch(32).prefetch(tf.data.AUTOTUNE)
+    # Preprocess data
+    train_data = preprocess_data(train_data, num_classes)
+    val_data = preprocess_data(val_data, num_classes)
+    print("Data preprocessed.")
 
     print("Creating model...")
     model = Sequential([
@@ -205,19 +145,19 @@ def train_model(seed):
         MaxPooling2D((2, 2)),
         Flatten(),
         Dense(256, activation='relu'),
-        Dense(25, activation='softmax')
+        Dense(num_classes, activation='softmax')
     ])
-    model.class_names = os.listdir(data_dir)
+    model.class_names = class_names
     print("Model created.")
-    model.summary()
+
     print("Compiling model...")
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     print("Model compiled.")
-
+    
     # Create directory if it does not exist
     model_dir = f"../models/1.{seed}"
     os.makedirs(model_dir, exist_ok=True)
-
+    
     checkpoint_callback = CustomModelCheckpoint(
         filepath=f"../models/1.{seed}/best_model_{seed}.keras",
         monitor='val_accuracy',
@@ -236,15 +176,12 @@ def train_model(seed):
     with mlflow.start_run(run_name=f"Train_1.{seed}"):
         print("Training model...")
         with tf.device('/GPU:0'):
-            history = model.fit(
-                train_dataset,
-                epochs=10,
-                validation_data=val_dataset,
-                callbacks=[checkpoint_callback, early_stopping_callback]
-            )
+            history = model.fit(train_data,
+                            epochs=10,
+                            validation_data=val_data,
+                            callbacks=[checkpoint_callback, early_stopping_callback])
         print("Model trained.")
-
-
+        
         # Save training and validation accuracy of the best epoch
         best_epoch = checkpoint_callback.best_epoch
         train_accuracy = history.history['accuracy'][best_epoch]
@@ -252,25 +189,24 @@ def train_model(seed):
         with open(f"../models/1.{seed}/training_accuracy_{seed}.txt", "w") as f:
             f.write(f"Training accuracy: {train_accuracy}\n")
             f.write(f"Test accuracy: {val_accuracy}\n")
-
+        
         model.load_weights(f"../models/1.{seed}/best_model_{seed}.keras")
         print("Best model loaded.")
-
+        
         model.save(f"../models/1.{seed}/trained_model_{seed}.keras")
         print("Model saved.")
 
-        # If you have a separate test dataset
         print("Evaluating model...")
         y_pred = []
         y_true = []
-        for features, labels in val_dataset:
+        for features, labels in val_data:
             predictions = model.predict(features)
             y_pred.extend(np.argmax(predictions, axis=1))
             y_true.extend(np.argmax(labels.numpy(), axis=1))
         accuracy = accuracy_score(y_true, y_pred)
-        report = classification_report(y_true, y_pred, target_names=label_encoder.classes_)
+        report = classification_report(y_true, y_pred, target_names=class_names)
         print("Model evaluated.")
-
+        
         print("Saving classification report...")
         with open(f"../models/1.{seed}/classification_report_{seed}.txt", "w") as f:
             f.write(report)
@@ -278,7 +214,7 @@ def train_model(seed):
 
         # Confusion Matrix
         cm = confusion_matrix(y_true, y_pred)
-        plot_confusion_matrix(cm, classes=label_encoder.classes_)
+        plot_confusion_matrix(cm, classes=class_names)
         plt.savefig(f"../models/1.{seed}/confusion_matrix_{seed}.png")
         plt.close()
 
@@ -301,12 +237,16 @@ def train_model(seed):
         mlflow.log_artifact(f"../models/1.{seed}/training_accuracy_{seed}.txt")
         mlflow.log_artifact(f"../models/1.{seed}/confusion_matrix_{seed}.png")
         mlflow.log_artifact(f"../models/1.{seed}/classification_report_heatmap_{seed}.png")
-
+        
         print("\n\n\n")
 
         print("Training completed. Accuracy:", accuracy)
         print("Classification Report:\n", report)
-
+    
 if __name__ == "__main__":
-    mlflow.set_tracking_uri("http://localhost:5001")
-    train_model(seed=10)
+    if os.getenv("RUNNING_IN_DOCKER"):
+        mlflow.set_tracking_uri("http://mlflow:5001")  # For Docker tracking server
+    else:
+        mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
+    for seed in range(10):
+        train_model(seed=seed)
