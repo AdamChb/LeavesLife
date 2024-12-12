@@ -1,8 +1,9 @@
 artifact_uri: mlflow-artifacts:/620155212435148677/851e6797041d4eba9ae45c24990d9fa7/artifacts
+deleted_time: 1733962984679
 end_time: 1733865080493
 entry_point_name: ''
 experiment_id: '620155212435148677'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: 851e6797041d4eba9ae45c24990d9fa7
 run_name: Train_1.10
 run_uuid: 851e6797041d4eba9ae45c24990d9fa7

@@ -205,10 +205,9 @@
 <body>
     <header>
         <div style="display: flex; align-items: center;">
-            <img src="leaficon.svg" alt="Logo">
+            <img src="{{ url_for('static', filename='images/leaficon.svg') }}" alt="Logo">
             <h1 class="name">Leaves Life</h1>
         </div>
-        <a href="project.html">Project presentation</a>
     </header>
     <main>
         <section class="title-section">
@@ -216,19 +215,21 @@
         </section>
         <div class="content-section">
             <section class="results">
-                <h2>Potato Leaf</h2>
+                <h2>{{ predicted_plant }}</h2>
                 <p>Model Used: Convolutional Neural Network (CNN)</p>
-                <p>Accuracy</p>
                 <div class="accuracy-bar">
-                    <span style="--bar-width: 85%;" data-content="85%"></span>
+                    <span style="--bar-width: {{ probability }}%;" data-content="{{ probability }} %"></span>
                 </div>
-                <p class="status diseased"><img src="cross-icon.svg" alt="Cross Icon">Leaf is Diseased (Disease name)</p>
-                <p class="status healthy"><img src="check-icon.svg" alt="Check Icon">Leaf is Healthy</p>
+                {% if predicted_disease == "Healthy" %}
+                    <p class="status healthy"><img src="{{ url_for('static', filename='images/check-icon.svg') }}" alt="Check Icon">Leaf is Healthy</p>
+                {% else %}
+                    <p class="status diseased"><img src="{{ url_for('static', filename='images/cross-icon.svg') }}" alt="Cross Icon">Leaf is Diseased ({{ predicted_disease }})</p>
+                {% endif %}
             </section>
-            <img src="leaf.jpg" class="leaf-image" alt="Leaf Image">
+            <img src="{{ url_for('uploaded_file', filename=image_path.split('/')[-1]) }}" class="leaf-image" alt="Leaf Image">
         </div>
         <div class="button-section">
-            <a href="index.html" class="button">Back to home page</a>
+            <a href="{{ url_for('home') }}" class="button">Back to home page</a>
         </div>
     </main>
     <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
