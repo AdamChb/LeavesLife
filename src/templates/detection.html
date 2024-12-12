@@ -227,7 +227,7 @@
                     Leaf is {{ 'Healthy' if predicted_class == '0' else 'Diseased' }}
                 </p>
             </section>
-            <img src="{{ url_for('static', filename='uploads/leaf.jpg') }}" class="leaf-image" alt="Leaf Image">
+            <img src="data:image/jpeg;base64,{{ image_data }}" alt="Uploaded Leaf Image">
         </div>
         <div class="button-section">
             <a href="/" class="button">Back to home page</a>
@@ -238,3 +238,32 @@
     </footer>
 </body>
 </html>
+<script>
+    labels = [
+    'Apple - Apple scab',
+    'Apple - Black rot',
+    'Apple - Cedar apple rust',
+    'Apple - Healthy',
+    'Corn (maize) - Cercospora leaf spot Gray leaf spot',
+    'Corn (maize) - Common rust',
+    'Corn (maize) - Healthy',
+    'Corn (maize) - Northern Leaf Blight',
+    'Grape - Black rot',
+    'Grape - Esca (Black Measles)',
+    'Grape - Healthy',
+    'Grape - Leaf blight (Isariopsis Leaf Spot)',
+    'Potato - Early blight',
+    'Potato - Healthy',
+    'Potato - Late blight',
+    'Tomato - Bacterial spot',
+    'Tomato - Early blight',
+    'Tomato - Healthy',
+    'Tomato - Late blight',
+    'Tomato - Leaf Mold',
+    'Tomato - Septoria leaf spot',
+    'Tomato - Spider mites Two-spotted spider mite',
+    'Tomato - Target Spot',
+    'Tomato - Tomato mosaic virus',
+    'Tomato - Tomato Yellow Leaf Curl Virus'
+]
+</script>
