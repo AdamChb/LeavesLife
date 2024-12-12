@@ -27,5 +27,7 @@ def predict_image(image_bytes, model_path=f"../models/{seed}/trained_model_{seed
 # Exemple d'utilisation
 if __name__ == "__main__":
     image_path = "../Dataset/Apple___Apple_scab/29ab8216-ec38-4efd-9c77-21068fa899a4___FREC_Scab 3241.JPG"
-    predicted_class, probability = predict_image(image_path)
+    with open(image_path, 'rb') as image_file:
+        image_bytes = image_file.read()
+    predicted_class, probability = predict_image(image_bytes)
     print(f"Predicted class: {predicted_class}, Probability: {probability}")

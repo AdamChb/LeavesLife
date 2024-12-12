@@ -43,7 +43,6 @@
         }
         main {
             padding: 5em 7em 10em 7em;
-            background: rgb(2,0,36);
             background: linear-gradient(
                 135deg,
                 #386641, /* Dark green */
@@ -53,9 +52,9 @@
                 #a7c957, /* Bright green */
                 #c2d882, /* Soft yellow-green */
                 #e3f4ab  /* Pale yellow */
-                );
+            );
         }
-        .title{
+        .title {
             font-size: 3em;
             opacity: .9;
             color: white;
@@ -63,7 +62,7 @@
             text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             animation: slideInFromTop 1s ease-out;
         }
-        .name{
+        .name {
             font-size: 2em;
         }
         .title-section {
@@ -110,10 +109,10 @@
 <body>
     <header>
         <div style="display: flex; align-items: center;">
-            <img src="leaficon.svg" alt="Logo">
+            <img src="{{ url_for('static', filename='leaficon.svg') }}" alt="Logo">
             <h1 class="name">Leaves Life</h1>
         </div>
-        <a href="project.html">Project presentation</a>
+        <a href="https://www.canva.com/design/DAGY6E8M9eI/lCGVxUnC6IHtywpZUMz1og/view?utm_content=DAGY6E8M9eI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2aaf426541">Project presentation</a>
     </header>
     <main>
         <section class="title-section">
@@ -127,193 +126,138 @@
                 <p>You only have to insert a leaf image that is supported by our project, and it will detect any disease or the healthyness of the leaf!</p>
             </section>
             <section class="drag-drop" onclick="document.getElementById('fileInput').click();" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-                <img src="upload.svg" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
+                <img src="{{ url_for('static', filename='upload.svg') }}" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
                 <h2>Upload Your Leaf Image</h2>
                 <p>Drag and drop an image here or click to select a file</p>
                 <input type="file" id="fileInput" class="hidden-input" onchange="fileInputHandler(event);">
             </section>
         </div>
     </main>
+    <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
+        <p>&copy; 2024 Mathias BENOIT - Adam CHABA - Eva MAROT - Sacha PORTAL</p>
+    </footer>
     <script>
+        // Prevent default behavior for drag over event
         function dragOverHandler(event) {
             event.preventDefault();
         }
 
+        // Handle file drop event
         function dropHandler(event) {
             event.preventDefault();
             const files = event.dataTransfer.files;
             if (files.length > 0) {
-                alert(`File ${files[0].name} uploaded successfully.`);
+                showSpinner();
+                uploadFile(files[0]);
             }
         }
 
+        // Handle file input change event
         function fileInputHandler(event) {
             const files = event.target.files;
             if (files.length > 0) {
-                alert(`File ${files[0].name} uploaded successfully.`);
+                showSpinner();
+                uploadFile(files[0]);
             }
         }
+
+        // Show spinner while uploading file
+        function showSpinner() {
+            const dragDropSection = document.querySelector('.drag-drop');
+            dragDropSection.innerHTML = '<div class="spinner"></div>';
+            dragDropSection.style.display = 'flex';
+            dragDropSection.style.alignItems = 'center';
+            dragDropSection.style.justifyContent = 'center';
+        }
+
+        // Hide spinner after uploading file
+        function hideSpinner() {
+            const dragDropSection = document.querySelector('.drag-drop');
+            dragDropSection.style.display = '';
+            dragDropSection.style.alignItems = '';
+            dragDropSection.style.justifyContent = '';
+            dragDropSection.innerHTML = `
+                <img src="templates/upload.svg" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
+                <h2>Upload Your Leaf Image</h2>
+                <p>Drag and drop an image here or click to select a file</p>
+                <input type="file" id="fileInput" class="hidden-input" onchange="fileInputHandler(event);">
+            `;
+        }
+
+        // Upload file to server
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = `detection.html?predicted_class=${data.predicted_class}&probability=${data.probability}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
-    <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">
-        <p>&copy; 2024 Mathias BENOIT - Adam CHABA - Eva MAROT - Sacha PORTAL</p>
-    </footer>
+
+    <!-- Spinner style -->
+    <style>
+        .spinner {
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: .9;
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </body>
 </html>
-<style>
-    @keyframes slideInFromTop {
-        from {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: .9;
-        }
-    }
-
-    @keyframes slideInFromLeft {
-        from {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideInFromRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-</style>
-<script>
-    function showSpinner() {
-        const spinner = document.createElement('div');
-        spinner.classList.add('spinner');
-        document.body.appendChild(spinner);
-    }
-
-    function hideSpinner() {
-        const spinner = document.querySelector('.spinner');
-        if (spinner) {
-            spinner.remove();
-        }
-    }
-
-    function fileInputHandler(event) {
-        const files = event.target.files;
-        if (files.length > 0) {
-            showSpinner();
-            setTimeout(() => {
-                hideSpinner();
-                window.location.href = 'detection.html';
-            }, 2000);
-        }
-    }
-
-    function dropHandler(event) {
-        event.preventDefault();
-        const files = event.dataTransfer.files;
-        if (files.length > 0) {
-            showSpinner();
-            setTimeout(() => {
-                hideSpinner();
-                window.location.href = 'detection.html';
-            }, 2000);
-        }
-    }
-</script>
-<style>
-    .spinner {
-        top: 50%;
-        left: 50%;
-        width: 50px;
-        height: 50px;
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        border-top: 5px solid #fff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        transform: translate(-50%, -50%);
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-</style>
-<script>
-    function showSpinner() {
-        const dragDropSection = document.querySelector('.drag-drop');
-        dragDropSection.innerHTML = '<div class="spinner"></div>';
-        dragDropSection.style.display = 'flex';
-        dragDropSection.style.alignItems = 'center';
-        dragDropSection.style.justifyContent = 'center';
-    }
-
-    function hideSpinner() {
-        const dragDropSection = document.querySelector('.drag-drop');
-        dragDropSection.style.display = '';
-        dragDropSection.style.alignItems = '';
-        dragDropSection.style.justifyContent = '';
-        dragDropSection.innerHTML = `
-            <img src="upload.svg" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
-            <h2>Upload Your Leaf Image</h2>
-            <p>Drag and drop an image here or click to select a file</p>
-            <input type="file" id="fileInput" class="hidden-input" onchange="fileInputHandler(event);">
-        `;
-    }
-
-    function uploadFile(file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        fetch('/', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            window.location.href = `detection.html?predicted_class=${data.predicted_class}&probability=${data.probability}`;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    function fileInputHandler(event) {
-        const files = event.target.files;
-        if (files.length > 0) {
-            showSpinner();
-            uploadFile(files[0]);
-        }
-    }
-
-    function dropHandler(event) {
-        event.preventDefault();
-        const files = event.dataTransfer.files;
-        if (files.length > 0) {
-            showSpinner();
-            uploadFile(files[0]);
-        }
-    }
-</script>

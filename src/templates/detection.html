@@ -205,10 +205,10 @@
 <body>
     <header>
         <div style="display: flex; align-items: center;">
-            <img src="leaficon.svg" alt="Logo">
+            <img src="{{ url_for('static', filename='leaficon.svg') }}" alt="Logo">
             <h1 class="name">Leaves Life</h1>
         </div>
-        <a href="project.html">Project presentation</a>
+        <a href="https://www.canva.com/design/DAGY6E8M9eI/lCGVxUnC6IHtywpZUMz1og/view?utm_content=DAGY6E8M9eI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2aaf426541">Project presentation</a>
     </header>
     <main>
         <section class="title-section">
@@ -216,19 +216,21 @@
         </section>
         <div class="content-section">
             <section class="results">
-                <h2>Potato Leaf</h2>
+                <h2>Leaf Image</h2>
                 <p>Model Used: Convolutional Neural Network (CNN)</p>
                 <p>Accuracy</p>
                 <div class="accuracy-bar">
-                    <span style="--bar-width: 85%;" data-content="85%"></span>
+                    <span style="--bar-width: {{ probability * 100 }}%;" data-content="{{ probability * 100 }}%"></span>
                 </div>
-                <p class="status diseased"><img src="cross-icon.svg" alt="Cross Icon">Leaf is Diseased (Disease name)</p>
-                <p class="status healthy"><img src="check-icon.svg" alt="Check Icon">Leaf is Healthy</p>
+                <p class="status {{ 'healthy' if predicted_class == '0' else 'diseased' }}">
+                    <img src="{{ url_for('static', filename='check-icon.svg') }}" alt="check/cross icon">
+                    Leaf is {{ 'Healthy' if predicted_class == '0' else 'Diseased' }}
+                </p>
             </section>
-            <img src="leaf.jpg" class="leaf-image" alt="Leaf Image">
+            <img src="{{ url_for('static', filename='uploads/leaf.jpg') }}" class="leaf-image" alt="Leaf Image">
         </div>
         <div class="button-section">
-            <a href="index.html" class="button">Back to home page</a>
+            <a href="/" class="button">Back to home page</a>
         </div>
     </main>
     <footer style="background-color: #386641; color: white; text-align: center; padding: 1em 0; width: 100%; bottom: 0;">

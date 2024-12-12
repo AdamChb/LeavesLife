@@ -27,7 +27,6 @@ def detection():
     probability = request.args.get('probability')
     return render_template("detection.html", predicted_class=predicted_class, probability=probability)
 
-
 if __name__ == '__main__':
     if os.getenv("RUNNING_IN_DOCKER"):
         mlflow.set_tracking_uri("http://mlflow:5000")  # For Docker tracking server
