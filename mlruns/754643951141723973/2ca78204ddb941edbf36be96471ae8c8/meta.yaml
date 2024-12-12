@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/754643951141723973/2ca78204ddb941edbf36be96471ae8c8/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '754643951141723973'
+lifecycle_stage: active
+run_id: 2ca78204ddb941edbf36be96471ae8c8
+run_name: Train_1.0
+run_uuid: 2ca78204ddb941edbf36be96471ae8c8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733953601485
+status: 1
+tags: []
+user_id: mat15

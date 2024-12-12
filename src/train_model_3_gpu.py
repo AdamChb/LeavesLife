@@ -153,13 +153,13 @@ def train_model(seed):
     print("Compiling model...")
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     print("Model compiled.")
-    
+    model.summary()
     # Create directory if it does not exist
-    model_dir = f"../models/1.{seed}"
+    model_dir = f"../models/3.{seed}"
     os.makedirs(model_dir, exist_ok=True)
     
     checkpoint_callback = CustomModelCheckpoint(
-        filepath=f"../models/1.{seed}/best_model_{seed}.keras",
+        filepath=f"../models/3.{seed}/best_model_{seed}.keras",
         monitor='val_accuracy',
         save_best_only=True,
         mode='max',
@@ -173,7 +173,7 @@ def train_model(seed):
     )
 
     mlflow.set_experiment("LeavesLife")
-    with mlflow.start_run(run_name=f"Train_1.{seed}"):
+    with mlflow.start_run(run_name=f"Train_3.{seed}"):
         print("Training model...")
         with tf.device('/GPU:0'):
             history = model.fit(train_data,
@@ -186,14 +186,14 @@ def train_model(seed):
         best_epoch = checkpoint_callback.best_epoch
         train_accuracy = history.history['accuracy'][best_epoch]
         val_accuracy = history.history['val_accuracy'][best_epoch]
-        with open(f"../models/1.{seed}/training_accuracy_{seed}.txt", "w") as f:
+        with open(f"../models/3.{seed}/training_accuracy_{seed}.txt", "w") as f:
             f.write(f"Training accuracy: {train_accuracy}\n")
             f.write(f"Test accuracy: {val_accuracy}\n")
         
-        model.load_weights(f"../models/1.{seed}/best_model_{seed}.keras")
+        model.load_weights(f"../models/3.{seed}/best_model_{seed}.keras")
         print("Best model loaded.")
         
-        model.save(f"../models/1.{seed}/trained_model_{seed}.keras")
+        model.save(f"../models/3.{seed}/trained_model_{seed}.keras")
         print("Model saved.")
 
         print("Evaluating model...")
@@ -208,19 +208,19 @@ def train_model(seed):
         print("Model evaluated.")
         
         print("Saving classification report...")
-        with open(f"../models/1.{seed}/classification_report_{seed}.txt", "w") as f:
+        with open(f"../models/3.{seed}/classification_report_{seed}.txt", "w") as f:
             f.write(report)
         print("Classification report saved.")
 
         # Confusion Matrix
         cm = confusion_matrix(y_true, y_pred)
         plot_confusion_matrix(cm, classes=class_names)
-        plt.savefig(f"../models/1.{seed}/confusion_matrix_{seed}.png")
+        plt.savefig(f"../models/3.{seed}/confusion_matrix_{seed}.png")
         plt.close()
 
         # Classification Report Heatmap
         plot_classification_report(report)
-        plt.savefig(f"../models/1.{seed}/classification_report_heatmap_{seed}.png")
+        plt.savefig(f"../models/3.{seed}/classification_report_heatmap_{seed}.png")
         plt.close()
 
         # Log metrics and artifacts to mlflow
@@ -232,11 +232,11 @@ def train_model(seed):
             mlflow.log_metric("train_loss", history.history['loss'][epoch], step=epoch)
             mlflow.log_metric("val_loss", history.history['val_loss'][epoch], step=epoch)
         mlflow.tensorflow.log_model(model, "model")
-        mlflow.log_artifact(f"../models/1.{seed}/classification_report_{seed}.txt")
-        mlflow.log_artifact(f"../models/1.{seed}/trained_model_{seed}.keras")
-        mlflow.log_artifact(f"../models/1.{seed}/training_accuracy_{seed}.txt")
-        mlflow.log_artifact(f"../models/1.{seed}/confusion_matrix_{seed}.png")
-        mlflow.log_artifact(f"../models/1.{seed}/classification_report_heatmap_{seed}.png")
+        mlflow.log_artifact(f"../models/3.{seed}/classification_report_{seed}.txt")
+        mlflow.log_artifact(f"../models/3.{seed}/trained_model_{seed}.keras")
+        mlflow.log_artifact(f"../models/3.{seed}/training_accuracy_{seed}.txt")
+        mlflow.log_artifact(f"../models/3.{seed}/confusion_matrix_{seed}.png")
+        mlflow.log_artifact(f"../models/3.{seed}/classification_report_heatmap_{seed}.png")
         
         print("\n\n\n")
 
