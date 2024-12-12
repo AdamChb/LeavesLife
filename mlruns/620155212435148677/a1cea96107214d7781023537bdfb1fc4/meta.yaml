@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/620155212435148677/a1cea96107214d7781023537bdfb1fc4/artifacts
+end_time: 1733818663223
+entry_point_name: ''
+experiment_id: '620155212435148677'
+lifecycle_stage: active
+run_id: a1cea96107214d7781023537bdfb1fc4
+run_name: Train_1.1
+run_uuid: a1cea96107214d7781023537bdfb1fc4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733816357847
+status: 3
+tags: []
+user_id: chaba

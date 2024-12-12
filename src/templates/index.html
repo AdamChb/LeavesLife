@@ -110,10 +110,9 @@
 <body>
     <header>
         <div style="display: flex; align-items: center;">
-            <img src="leaficon.svg" alt="Logo">
+            <img src="{{ url_for('static', filename='images/leaficon.svg') }}" alt="Logo">
             <h1 class="name">Leaves Life</h1>
         </div>
-        <a href="project.html">Project presentation</a>
     </header>
     <main>
         <section class="title-section">
@@ -122,12 +121,12 @@
         <div class="content-section">
             <section class="presentation">
                 <h2>What is Leaves Life?</h2>
-                <p>Welcome to our machine learning project. We use different supervised learning techniques in order to detect diseases in leaf pictures. <a href="project.html">Learn more about our project here.</a></p>
+                <p>Welcome to our machine learning project. We use different supervised learning techniques in order to detect diseases in leaf pictures.</p>
                 <h2>How to use it?</h2>
                 <p>You only have to insert a leaf image that is supported by our project, and it will detect any disease or the healthyness of the leaf!</p>
             </section>
             <section class="drag-drop" onclick="document.getElementById('fileInput').click();" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-                <img src="upload.svg" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
+                <img src="{{ url_for('static', filename='images/upload.svg') }}" alt="Upload Icon" style="width: 50px; height: 50px; margin-bottom: 10px;">
                 <h2>Upload Your Leaf Image</h2>
                 <p>Drag and drop an image here or click to select a file</p>
                 <input type="file" id="fileInput" class="hidden-input" onchange="fileInputHandler(event);">
@@ -293,7 +292,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            window.location.href = `detection.html?predicted_class=${data.predicted_class}&probability=${data.probability}`;
+            window.location.href = `/detection/?predicted_plant=${data.predicted_plant}&predicted_disease=${data.predicted_disease}&probability=${data.probability}&image_path=${data.image_path}`;
         })
         .catch(error => {
             console.error('Error:', error);
