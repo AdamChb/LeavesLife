@@ -1,3 +1,18 @@
+<!-----------------------------------#
+# Machine Learning Project
+# LeavesLife: Plant Disease Detection
+# Dates: 2024-11-27 - 2024-12-12
+#
+# Authors:
+# - Mathias BENOIT
+# - Adam CHABA
+# - Eva MAROT
+# - Sacha PORTAL
+#
+# File Description: 
+# HTML template for the detection results page.
+#----------------------------------->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -205,6 +220,7 @@
 <body>
     <header>
         <div style="display: flex; align-items: center;">
+            <!-- Logo -->
             <img src="{{ url_for('static', filename='images/leaficon.svg') }}" alt="Logo">
             <h1 class="name">Leaves Life</h1>
         </div>
@@ -215,20 +231,25 @@
         </section>
         <div class="content-section">
             <section class="results">
+                <!-- Display the predicted plant name -->
                 <h2>{{ predicted_plant }}</h2>
                 <p>Model Used: Convolutional Neural Network (CNN)</p>
                 <div class="accuracy-bar">
+                    <!-- Progress bar -->
                     <span style="--bar-width: {{ probability }}%;" data-content="{{ probability }} %"></span>
                 </div>
+                <!-- Display the prediction status -->
                 {% if predicted_disease == "Healthy" %}
                     <p class="status healthy"><img src="{{ url_for('static', filename='images/check-icon.svg') }}" alt="Check Icon">Leaf is Healthy</p>
                 {% else %}
                     <p class="status diseased"><img src="{{ url_for('static', filename='images/cross-icon.svg') }}" alt="Cross Icon">Leaf is Diseased ({{ predicted_disease }})</p>
                 {% endif %}
             </section>
+            <!-- Display the uploaded image -->
             <img src="{{ url_for('uploaded_file', filename=image_path.split('/')[-1]) }}" class="leaf-image" alt="Leaf Image">
         </div>
         <div class="button-section">
+            <!-- Button to go back to the home page -->
             <a href="{{ url_for('home') }}" class="button">Back to home page</a>
         </div>
     </main>

@@ -1,5 +1,16 @@
+#-----------------------------------#
+# Machine Learning Project
+# LeavesLife: Plant Disease Detection
+# Dates: 2024-11-27 - 2024-12-12
+#
+# Authors:
+# - Mathias BENOIT
+# - Adam CHABA
+# - Eva MAROT
+# - Sacha PORTAL
+#-----------------------------------#
+
 flask
-pandas
 numpy
 scikit-learn
 mlflow

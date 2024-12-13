@@ -1,5 +1,17 @@
+#-----------------------------------#
+# Machine Learning Project
+# LeavesLife: Plant Disease Detection
+# Dates: 2024-11-27 - 2024-12-12
+#
+# Authors:
+# - Mathias BENOIT
+# - Adam CHABA
+# - Eva MAROT
+# - Sacha PORTAL
+#-----------------------------------#
+
 # Use a base Python image
-FROM python:3.9-slim
+FROM python:3.8-slim
 
 # Set the working directory in the container
 WORKDIR /app

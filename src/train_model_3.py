@@ -1,22 +1,70 @@
+#-----------------------------------#
+# Machine Learning Project
+# LeavesLife: Plant Disease Detection
+# Dates: 2024-11-27 - 2024-12-12
+#
+# Authors:
+# - Mathias BENOIT
+# - Adam CHABA
+# - Eva MAROT
+# - Sacha PORTAL
+#
+# File Description: 
+# Train a model to classify plant diseases
+# Version 3 - With GPU
+#
+# This version has a problem and the model
+# is not trained correctly without indicating 
+# an error in the code.
+#-----------------------------------#
+
+
+# Importing required libraries
 import os
+import random
+import itertools
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
 import mlflow
 import mlflow.tensorflow
-import random
-import matplotlib.pyplot as plt
-import itertools
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 
+
+# Define seed for reproducibility
 def define_seed(seed):
+    """
+    Define seed for reproducibility.
+
+    Arguments:
+        - seed (int): Seed value
+    """
+    
     random.seed(seed)
     np.random.seed(seed)
     tf.random.set_seed(seed)
 
+
+# Load data
 def load_data(data_dir, img_height=256, img_width=256, batch_size=32):
+    """
+    Load data from directory. Split into training and validation sets. 
+    
+    Arguments:
+        - data_dir (str): Directory containing the dataset
+        - img_height (int): Image height
+        - img_width (int): Image width
+        - batch_size (int): Batch size
+        
+    Returns:
+        - train_data (tf.data.Dataset): Training data
+        - val_data (tf.data.Dataset): Validation data
+    """
+    
+    # Load data from directory and split into training and validation sets
     train_data = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         validation_split=0.2,
@@ -37,11 +85,33 @@ def load_data(data_dir, img_height=256, img_width=256, batch_size=32):
     
     return train_data, val_data
 
+
+# Preprocess data
 def preprocess_data(dataset, num_classes):
     """
-    Normalize images and convert labels to categorical.
+    Preprocess data. Normalize images and convert labels to one-hot encoding.
+    
+    Arguments:
+        - dataset (tf.data.Dataset): Dataset
+        - num_classes (int): Number of classes
+        
+    Returns:
+        - dataset (tf.data.Dataset): Preprocessed dataset
     """
+    
     def process(image, label):
+        """
+        Normalize image and convert label to one-hot encoding.
+        
+        Arguments:
+            - image (tf.Tensor): Image
+            - label (tf.Tensor): Label
+            
+        Returns:
+            - image (tf.Tensor): Normalized image
+            - label (tf.Tensor): One-hot encoded label
+        """
+        
         # Normalize image
         image = tf.cast(image, tf.float32) / 255.0
         # Convert label to one-hot encoding
@@ -52,7 +122,20 @@ def preprocess_data(dataset, num_classes):
     dataset = dataset.map(process, num_parallel_calls=tf.data.AUTOTUNE)
     return dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
+
+# Plot confusion matrix
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
+    """
+    Plot a confusion matrix.
+    
+    Arguments:
+        - cm (numpy.ndarray): Confusion matrix
+        - classes (list): Class names
+        - title (str): Title
+        - cmap (matplotlib.colors.Colormap): Colormap
+    """
+    
+    # Plot confusion matrix
     plt.figure(figsize=(17, 17))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title, fontsize=20)
@@ -61,6 +144,7 @@ def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blu
     plt.xticks(tick_marks, classes, rotation=45, ha='right')
     plt.yticks(tick_marks, classes)
 
+    # Add text annotations
     fmt = 'd'
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
@@ -68,11 +152,25 @@ def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blu
                  horizontalalignment="center",
                  color="white" if cm[i, j] > thresh else "black")
 
+    # Add labels
     plt.ylabel('True label', fontsize=15)
     plt.xlabel('Predicted label', fontsize=15)
+    # Adjust layout
     plt.tight_layout()
-
+    
+    
+# Plot classification report
 def plot_classification_report(cr, title='Classification report', cmap='RdBu'):
+    """
+    Plot a classification report.
+    
+    Arguments:
+        - cr (str): Classification report
+        - title (str): Title
+        - cmap (str): Colormap
+    """
+    
+    # Split classification report into lines
     lines = cr.split('\n')
     classes = []
     plotMat = []
@@ -84,6 +182,7 @@ def plot_classification_report(cr, title='Classification report', cmap='RdBu'):
         v = [float(x) for x in t[1:4]]
         plotMat.append(v)
 
+    # Plot classification report
     plt.figure(figsize=(10, 15))
     plt.imshow(plotMat, interpolation='nearest', cmap=cmap)
     plt.title(title, fontsize=20)
@@ -93,23 +192,52 @@ def plot_classification_report(cr, title='Classification report', cmap='RdBu'):
     plt.xticks(np.arange(3), x_tick_marks, rotation=45, ha='right')
     plt.yticks(np.arange(len(classes)), y_tick_marks)
     
+    # Add text annotations
     thresh = np.max(plotMat) / 2.
     for i, j in itertools.product(range(len(classes)), range(3)):
         plt.text(j, i, format(plotMat[i][j], '.2f'),
                  horizontalalignment="center",
                  color="white" if plotMat[i][j] > thresh else "black")
 
+    # Add labels
     plt.ylabel('Classes', fontsize=15)
     plt.xlabel('Metrics', fontsize=15)
+    # Adjust layout
     plt.tight_layout()
     plt.subplots_adjust(left=0.2, right=0.8, top=0.9, bottom=0.1)
 
+
+
+# Custom ModelCheckpoint class
 class CustomModelCheckpoint(ModelCheckpoint):
+    """
+    Custom ModelCheckpoint class.
+
+    Arguments:
+        - ModelCheckpoint: ModelCheckpoint class
+    """
+    
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the CustomModelCheckpoint
+        
+        Arguments:
+            - *args: Variable length argument list
+            - **kwargs: Arbitrary keyword arguments
+        """
+        
         super().__init__(*args, **kwargs)
         self.best_epoch = -1
 
     def on_epoch_end(self, epoch, logs=None):
+        """
+        Called at the end of an epoch.
+        
+        Arguments:
+            - epoch (int): Epoch number
+            - logs (dict): Dictionary of logs
+        """
+        
         if logs is None:
             logs = {}
         current = logs.get(self.monitor)
@@ -121,9 +249,20 @@ class CustomModelCheckpoint(ModelCheckpoint):
             self.best_epoch = epoch
             self.model.save(self.filepath.format(epoch=epoch, **logs), overwrite=True)
 
+
+# Train model
 def train_model(seed):
+    """
+    Train a model to classify plant diseases.
+    
+    Arguments:
+        - seed (int): Seed value
+    """
+    
+    # Define seed for reproducibility
     define_seed(seed)
     
+    # Load data
     print("Loading data...")
     script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))    
     data_dir = os.path.join(script_dir, 'Dataset')
@@ -137,6 +276,7 @@ def train_model(seed):
     val_data = preprocess_data(val_data, num_classes)
     print("Data preprocessed.")
 
+    # Create model
     print("Creating model...")
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(256, 256, 3)),
@@ -150,16 +290,21 @@ def train_model(seed):
     model.class_names = class_names
     print("Model created.")
 
+    # Compile model
     print("Compiling model...")
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     print("Model compiled.")
     
+    # Model summary
+    model.summary()
+    
     # Create directory if it does not exist
-    model_dir = f"../models/1.{seed}"
+    model_dir = f"../models/3.{seed}"
     os.makedirs(model_dir, exist_ok=True)
     
+    # Create callbacks
     checkpoint_callback = CustomModelCheckpoint(
-        filepath=f"../models/1.{seed}/best_model_{seed}.keras",
+        filepath=f"../models/3.{seed}/best_model_{seed}.keras",
         monitor='val_accuracy',
         save_best_only=True,
         mode='max',
@@ -172,10 +317,13 @@ def train_model(seed):
         restore_best_weights=True
     )
 
+    # Start mlflow run
     mlflow.set_experiment("LeavesLife")
-    with mlflow.start_run(run_name=f"Train_1.{seed}"):
+    with mlflow.start_run(run_name=f"Train_3.{seed}"):
+        # Train model with GPU
         print("Training model...")
-        history = model.fit(train_data,
+        with tf.device('/GPU:0'):
+            history = model.fit(train_data,
                             epochs=10,
                             validation_data=val_data,
                             callbacks=[checkpoint_callback, early_stopping_callback])
@@ -185,16 +333,19 @@ def train_model(seed):
         best_epoch = checkpoint_callback.best_epoch
         train_accuracy = history.history['accuracy'][best_epoch]
         val_accuracy = history.history['val_accuracy'][best_epoch]
-        with open(f"../models/1.{seed}/training_accuracy_{seed}.txt", "w") as f:
+        with open(f"../models/3.{seed}/training_accuracy_{seed}.txt", "w") as f:
             f.write(f"Training accuracy: {train_accuracy}\n")
             f.write(f"Test accuracy: {val_accuracy}\n")
         
-        model.load_weights(f"../models/1.{seed}/best_model_{seed}.keras")
+        # Load best model
+        model.load_weights(f"../models/3.{seed}/best_model_{seed}.keras")
         print("Best model loaded.")
         
-        model.save(f"../models/1.{seed}/trained_model_{seed}.keras")
+        # Save model
+        model.save(f"../models/3.{seed}/trained_model_{seed}.keras")
         print("Model saved.")
 
+        # Evaluate model
         print("Evaluating model...")
         y_pred = []
         y_true = []
@@ -206,20 +357,21 @@ def train_model(seed):
         report = classification_report(y_true, y_pred, target_names=class_names)
         print("Model evaluated.")
         
+        # Save classification report
         print("Saving classification report...")
-        with open(f"../models/1.{seed}/classification_report_{seed}.txt", "w") as f:
+        with open(f"../models/3.{seed}/classification_report_{seed}.txt", "w") as f:
             f.write(report)
         print("Classification report saved.")
 
         # Confusion Matrix
         cm = confusion_matrix(y_true, y_pred)
         plot_confusion_matrix(cm, classes=class_names)
-        plt.savefig(f"../models/1.{seed}/confusion_matrix_{seed}.png")
+        plt.savefig(f"../models/3.{seed}/confusion_matrix_{seed}.png")
         plt.close()
 
         # Classification Report Heatmap
         plot_classification_report(report)
-        plt.savefig(f"../models/1.{seed}/classification_report_heatmap_{seed}.png")
+        plt.savefig(f"../models/3.{seed}/classification_report_heatmap_{seed}.png")
         plt.close()
 
         # Log metrics and artifacts to mlflow
@@ -231,20 +383,22 @@ def train_model(seed):
             mlflow.log_metric("train_loss", history.history['loss'][epoch], step=epoch)
             mlflow.log_metric("val_loss", history.history['val_loss'][epoch], step=epoch)
         mlflow.tensorflow.log_model(model, "model")
-        mlflow.log_artifact(f"../models/1.{seed}/classification_report_{seed}.txt")
-        mlflow.log_artifact(f"../models/1.{seed}/trained_model_{seed}.keras")
-        mlflow.log_artifact(f"../models/1.{seed}/training_accuracy_{seed}.txt")
-        mlflow.log_artifact(f"../models/1.{seed}/confusion_matrix_{seed}.png")
-        mlflow.log_artifact(f"../models/1.{seed}/classification_report_heatmap_{seed}.png")
+        mlflow.log_artifact(f"../models/3.{seed}/classification_report_{seed}.txt")
+        mlflow.log_artifact(f"../models/3.{seed}/trained_model_{seed}.keras")
+        mlflow.log_artifact(f"../models/3.{seed}/training_accuracy_{seed}.txt")
+        mlflow.log_artifact(f"../models/3.{seed}/confusion_matrix_{seed}.png")
+        mlflow.log_artifact(f"../models/3.{seed}/classification_report_heatmap_{seed}.png")
         
+        # Print results
         print("\n\n\n")
-
         print("Training completed. Accuracy:", accuracy)
         print("Classification Report:\n", report)
     
 if __name__ == "__main__":
+    # Set tracking URI
     if os.getenv("RUNNING_IN_DOCKER"):
         mlflow.set_tracking_uri("http://mlflow:5001")  # For Docker tracking server
     else:
         mlflow.set_tracking_uri("http://localhost:5001")  # For local tracking server
-    train_model(seed=10)
+    # Train model
+    train_model(seed=0)

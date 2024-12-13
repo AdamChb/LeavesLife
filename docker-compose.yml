@@ -1,3 +1,15 @@
+#-----------------------------------#
+# Machine Learning Project
+# LeavesLife: Plant Disease Detection
+# Dates: 2024-11-27 - 2024-12-12
+#
+# Authors:
+# - Mathias BENOIT
+# - Adam CHABA
+# - Eva MAROT
+# - Sacha PORTAL
+#-----------------------------------#
+
 services:
   web:
     build:
@@ -5,7 +17,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
-    # restart: unless-stopped
     volumes:
       - ./src:/app
       - ./Dataset:/Dataset
@@ -16,7 +27,6 @@ services:
       - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
       - RUNNING_IN_DOCKER=true
-    mem_limit: 20g
     depends_on:
       - mlflow
     
