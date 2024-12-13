@@ -30,6 +30,11 @@ Run the Application
 cd src
 python app.py
 ```
+OR
+Build and run the docker image
+```
+docker compose up --build
+```
 
 The application will be available at ```http://localhost:5000```.
 
@@ -37,7 +42,7 @@ The application will be available at ```http://localhost:5000```.
 ## Setup for training on CPU
 Complete the simple setup first, then:
 
-Build the docker image
+Build and run the docker image
 ```
 docker compose up --build
 ```
@@ -46,7 +51,12 @@ This will start the MLflow server at ```http://localhost:5001```.
 Run the training script
 ```
 cd src
-python train_model.py
+python train_model_1.py
+```
+OR
+```
+cd src
+python train_model_2.py
 ```
 
 ## Setup for training on GPU
@@ -77,7 +87,7 @@ Install other dependencies
 pip install -r requirements.txt
 ```
 
-Build the docker image
+Build and run the docker image
 ```
 docker compose up --build
 ```
@@ -86,5 +96,5 @@ This will start the MLflow server at ```http://localhost:5001```.
 Run the training script
 ```
 cd src
-python train_model.py
+python train_model_3.py
 ```
