@@ -1,6 +1,12 @@
 # Leaves Life 🌿
 Leaf Disease Detection on Images with Neural Networks Project.
 
+Authors:
+- [Mathias BENOIT](mailto:mathias.benoit@efrei.net)
+- [Adam CHABA](mailto:adam.chaba@efrei.net)
+- [Eva MAROT](mailto:eva.marot@efrei.net)
+- [Sacha PORTAL](mailto:sacha.portal@efrei.net)
+
 ## Prerequisites
 - Python 3.8 or higher
 - Docker
